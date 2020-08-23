@@ -1,30 +1,23 @@
-const { validationResult } = require('express-validator')
 const Tarea = require('../../models/tarea/')
 const Proyecto = require('../../models/proyecto/')
 
 exports.crearTarea = async (req, res) => {
-	const errores = validationResult(req)
-	if(!errores.isEmpty()) {
-		return res.status(400).json({
-			errores: errores.array()
-		})
-	}
 	try {
 		const { proyecto } = req.body
 		const proyectoEncontrado = await Proyecto.findById(proyecto)
 		if(!proyectoEncontrado) {
-			return res.json({
+			return res.status(404).json({
 				msg: 'Este proyecto no existe'
 			})
 		}
 		if(proyectoEncontrado.creador.toString() !== req.usuario.id) {
-			return res.json({
+			return res.status(401).json({
 				msg: 'No autorizado'
 			})
 		}
 		const tarea = new Tarea(req.body)
 		await tarea.save()
-		res.json({
+		res.status(200).json({
 			msg: 'Tarea agregada correctamente',
 			tarea
 		})
@@ -38,20 +31,20 @@ exports.crearTarea = async (req, res) => {
 
 exports.obtenerTareas = async (req, res) => {
 	try {
-		const { proyecto } = req.body
+		const { proyecto } = req.query
 		const proyectoEncontrado = await Proyecto.findById(proyecto)
 		if(!proyectoEncontrado) {
-			return res.json({
+			return res.status(404).json({
 				msg: 'Este proyecto no existe'
 			})
 		}
 		if(proyectoEncontrado.creador.toString() !== req.usuario.id) {
-			return res.json({
+			return res.status(401).json({
 				msg: 'No autorizado'
 			})
 		}
-		const tareas = await Tarea.find({proyecto})
-		res.json({
+		const tareas = await Tarea.find({ proyecto }).sort({ creado: -1 })
+		res.status(200).json({
 			msg: 'Estas son las tareas del proyecto',
 			tareas
 		})
@@ -64,24 +57,24 @@ exports.obtenerTareas = async (req, res) => {
 }
 
 exports.actualizarTarea = async (req, res) => {
-	const tareaId = req.params.id
 	try {
+		const tareaId = req.params.id
 		let tarea = await Tarea.findById(tareaId)
 		if(!tarea) {
-			return res.json({
+			return res.status(404).json({
 				msg: 'Esta tarea no existe'
 			})
 		}
 		const { estado, nombre, proyecto } = req.body
 		const proyectoEncontrado = await Proyecto.findById(proyecto)
 		if(proyectoEncontrado.creador.toString() !== req.usuario.id) {
-			return res.json({
+			return res.status(401).json({
 				msg: 'No autorizado'
 			})
 		}
 		const nuevaTarea = {}
-		nuevaTarea.nombre = nombre ? nombre : ''
-		nuevaTarea.estado = estado ? estado : false
+		nuevaTarea.nombre = nombre || ''
+		nuevaTarea.estado = estado || false
 		tarea = await Tarea.findOneAndUpdate(
 			{
 				_id: tareaId
@@ -93,7 +86,7 @@ exports.actualizarTarea = async (req, res) => {
 				new: true
 			}
 		)
-		res.json({
+		res.status(200).json({
 			msg: 'Tarea actualizada correctamente',
 			tarea
 		})
@@ -106,23 +99,23 @@ exports.actualizarTarea = async (req, res) => {
 }
 
 exports.eliminarTarea = async (req, res) => {
-	const tareaId = req.params.id
 	try {
+		const tareaId = req.params.id
 		let tarea = await Tarea.findById(tareaId)
 		if(!tarea) {
-			return res.json({
+			return res.status(404).json({
 				msg: 'Esta tarea no existe'
 			})
 		}
-		const { proyecto } = req.body
+		const { proyecto } = req.query
 		const proyectoEncontrado = await Proyecto.findById(proyecto)
 		if(proyectoEncontrado.creador.toString() !== req.usuario.id) {
-			return res.json({
+			return res.status(401).json({
 				msg: 'No autorizado'
 			})
 		}
 		await Tarea.findOneAndRemove({ _id: tareaId })
-		res.json({
+		res.status(200).json({
 			msg: 'Tarea eliminada correctamente'
 		})
 	} catch(e) {

@@ -4,18 +4,18 @@ const jwt = require('jsonwebtoken')
 module.exports = (req, res, next) => {
 	const token = req.header('x-auth-token')
 	if(!token) {
-		return res.json({
+		return res.status(401).json({
 			msg: 'No hay token. Acceso denegado'
 		})
 	}
 	try {
-		const cifrado = jwt.verify(token, process.env.JWT_SECRET)
-		req.usuario = cifrado.usuario
+		const { usuario } = jwt.verify(token, process.env.JWT_SECRET)
+		req.usuario = usuario
 		next()
 	} catch(e) {
-		console.log('Token no valido')
+		console.log('Token incorrecto')
 		res.status(401).json({
-			msg: 'Token no válido'
+			msg: 'Token incorrecto'
 		})
 	}
 }

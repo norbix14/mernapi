@@ -1,25 +1,19 @@
-const { validationResult } = require('express-validator')
 const Proyecto = require('../../models/proyecto/')
+const Tarea = require('../../models/tarea/')
 
 exports.crearProyecto = async (req, res) => {
-	const errores = validationResult(req)
-	if(!errores.isEmpty()) {
-		return res.status(400).json({
-			errores: errores.array()
-		})
-	}
 	try {
 		const proyecto = new Proyecto(req.body)
 		proyecto.creador = req.usuario.id
 		await proyecto.save()
-		res.json({
+		res.status(200).json({
 			msg: 'Proyecto creado correctamente',
 			proyecto
 		})
 	} catch(e) {
-		console.log('Hubo un error al crear el proyecto')
+		console.log('Ha ocurrido un error al crear el proyecto')
 		res.status(500).json({
-			msg: 'Hubo un error al crear el proyecto' 
+			msg: 'Ha ocurrido un error al crear el proyecto' 
 		})
 	}
 }
@@ -31,7 +25,7 @@ exports.obtenerProyectos = async (req, res) => {
 		}).sort({
 			creado: -1
 		})
-		res.json({
+		res.status(200).json({
 			msg: 'Estos son tus proyectos',
 			proyectos
 		})
@@ -44,28 +38,22 @@ exports.obtenerProyectos = async (req, res) => {
 }
 
 exports.actualizarProyecto = async (req, res) => {
-	const errores = validationResult(req)
-	if(!errores.isEmpty()) {
-		return res.json({
-			errores: errores.array()
-		})
-	}
-	const proyectoId = req.params.id
 	try {
+		const proyectoId = req.params.id
 		let proyecto = await Proyecto.findById(proyectoId)
 		if(!proyecto) {
-			return res.json({
+			return res.status(404).json({
 				msg: 'Este proyecto no existe'
 			})
 		}
 		if(proyecto.creador.toString() !== req.usuario.id) {
-			return res.json({
+			return res.status(401).json({
 				msg: 'No autorizado'
 			})
 		}
 		const { nombre } = req.body
 		const nuevoProyecto = {}
-		nuevoProyecto.nombre = nombre ? nombre : ''
+		if(nombre) nuevoProyecto.nombre = nombre
 		proyecto = await Proyecto.findByIdAndUpdate(
 			{
 				_id: proyectoId
@@ -77,7 +65,7 @@ exports.actualizarProyecto = async (req, res) => {
 				new: true
 			}
 		)
-		res.json({
+		res.status(200).json({
 			msg: 'Proyecto actualizado correctamente',
 			proyecto
 		})
@@ -90,21 +78,22 @@ exports.actualizarProyecto = async (req, res) => {
 }
 
 exports.eliminarProyecto = async (req, res) => {
-	const proyectoId = req.params.id
 	try {
+		const proyectoId = req.params.id
 		let proyecto = await Proyecto.findById(proyectoId)
 		if(!proyecto) {
-			return res.json({
+			return res.status(404).json({
 				msg: 'Este proyecto no existe'
 			})
 		}
 		if(proyecto.creador.toString() !== req.usuario.id) {
-			return res.json({
+			return res.status(401).json({
 				msg: 'No autorizado'
 			})
 		}
+		await Tarea.deleteMany({ proyecto: proyectoId })
 		await Proyecto.findOneAndRemove({ _id: proyectoId })
-		res.json({
+		res.status(200).json({
 			msg: 'Proyecto eliminado correctamente'
 		})
 	} catch(e) {
