@@ -12,5 +12,6 @@ Instalar las dependencias necesarias
 
 ### `npm i`
 
-Ejecutar [API](http://localhost:4000)
+Ejecutar [API](http://localhost:4000) en modo de desarrollo
 
+### `npm run dev`
