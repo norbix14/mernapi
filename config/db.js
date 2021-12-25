@@ -1,4 +1,4 @@
-require('dotenv').config({ path: 'variables.env' })
+require('dotenv').config()
 const mongoose = require('mongoose')
 
 const conectarDB = async () => {
@@ -12,7 +12,6 @@ const conectarDB = async () => {
 		console.log('La base de datos esta conectada')
 	} catch(e) {
 		console.log('No se ha podido conectar a BD')
-		process.exit(1)
 	}
 }
 

@@ -1,6 +1,6 @@
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const tareaSchema = mongoose.Schema({
+const tareaSchema = Schema({
 	nombre: {
 		type: String,
 		required: true,
@@ -15,9 +15,9 @@ const tareaSchema = mongoose.Schema({
 		default: Date.now()
 	},
 	proyecto: {
-		type: mongoose.Schema.Types.ObjectId,
+		type: Schema.Types.ObjectId,
 		ref: 'Proyectos'
 	}
 })
 
-module.exports = mongoose.model('Tareas', tareaSchema)
+module.exports = model('Tareas', tareaSchema)

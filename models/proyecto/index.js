@@ -1,13 +1,13 @@
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 
-const proyectosSchema = mongoose.Schema({
+const proyectosSchema = Schema({
 	nombre: {
 		type: String,
 		required: true,
 		trim: true
 	},
 	creador: {
-		type: mongoose.Schema.Types.ObjectId,
+		type: Schema.Types.ObjectId,
 		ref: 'Usuario'
 	},
 	creado: {
@@ -16,4 +16,4 @@ const proyectosSchema = mongoose.Schema({
 	}
 })
 
-module.exports = mongoose.model('Proyectos', proyectosSchema)
+module.exports = model('Proyectos', proyectosSchema)

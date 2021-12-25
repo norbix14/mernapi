@@ -6,27 +6,28 @@ API para la creación de proyectos y tareas
 
 Clonar repositorio
 
-**`git clone <repository> --branch <master> <directory>`**
+**`git clone <repository>`**
 
 Instalar las dependencias necesarias
 
 **`npm i`**
 
-Ejecutar **[API](http://localhost:4000) en modo de desarrollo**
+Ejecutar la **[API](http://localhost:4000) en modo de desarrollo**
 
 **`npm run dev`**
 
 ## Elementos necesarios
 
-**Url del frontend en caso de requerirlo por CORS**
+### Variables de entorno
 
-		FRONTEND_URL=""
+```
+	# Url del frontend en caso de requerirlo por CORS
+	FRONTEND_URL=""
 
-**Url de MongoDbAtlas**
+	# Url de MongoDbAtlas
+	MONGODB_URL_LOCAL=""
+	MONGODB_URL_REMOTE=""
 
-		MONGODB_URL_LOCAL=""
-		MONGODB_URL_REMOTE=""
-
-**Signature de JWT**
-
-		JWT_SECRET=""
+	# Signature de JWT
+	JWT_SECRET=""
+```
